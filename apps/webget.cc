@@ -1,16 +1,40 @@
+#include "address.hh"
 #include "socket.hh"
 
 #include <cstdlib>
+#include <format>
 #include <iostream>
 #include <span>
 #include <string>
+#include <sys/socket.h>
+#include <vector>
 
 using namespace std;
 
 void get_URL( const string& host, const string& path )
 {
-  cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
-  cerr << "Warning: get_URL() has not been implemented yet.\n";
+  auto socket = TCPSocket();
+  auto address = Address( host, "http" );
+  socket.connect( address );
+
+  socket.write( format( "GET {} HTTP/1.1\r\n", path ) );
+  socket.write( format( "Host: {} \r\n", host ) );
+
+  socket.write( "Connection: close\r\n" );
+  socket.write( "\r\n" );
+
+  // socket.shutdown( SHUT_WR ); // 关闭写管道
+
+  string buffer;
+  while ( !socket.eof() ) {
+    socket.read( buffer );
+    cout << buffer;
+  }
+
+  // socket.close();
+
+  // cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
+  // cerr << "Warning: get_URL() has not been implemented yet.\n";
 }
 
 int main( int argc, char* argv[] )
