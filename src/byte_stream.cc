@@ -8,12 +8,19 @@ ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
 void Writer::push( string data )
 {
   if ( is_closed() )
-    return;
-  if ( haveWritten_ - haveRead_ == capacity_ )
-    return;
-  size_t len = min( capacity_ - ( haveWritten_ - haveRead_ ), data.size() );
-  buffer_ += data.substr( 0, len );
-  haveWritten_ += len;
+    return; // 如果关闭了 就不push 进来了
+
+  size_t writable = capacity_ - ( haveWritten_ - haveRead_ ); // 容量-现在 buffer 里有的
+  if ( writable == 0 )
+    return; // 如果不能写 也不能push进来
+
+  if ( data.size() <= writable ) {
+    haveWritten_ += data.size();
+    buffer_ += std::move( data ); // 如果可以读进来 直接 move 夺取
+  } else {
+    buffer_ += data.substr( 0, writable ); // 能读多少就读多少
+    haveWritten_ += writable;
+  }
 }
 
 void Writer::close()
@@ -38,19 +45,19 @@ uint64_t Writer::bytes_pushed() const
 
 string_view Reader::peek() const
 {
-  return std::string_view( buffer_ ).substr( offset_ );
+  return std::string_view( buffer_ ).substr( offset_ ); // string_view 优化获取子串
 }
 
 void Reader::pop( uint64_t len )
 {
-  len = min( len, buffer_.size() - offset_ );
+  len = min( len, buffer_.size() - offset_ ); // 实际能 pop 多少
   if ( len == 0 )
     return;
   offset_ += len;
   haveRead_ += len;
-  if ( offset_ > 65536 ) {
+  if ( offset_ > 8192 ) {
     buffer_.erase( 0, offset_ );
-    offset_ = 0;
+    offset_ = 0;//offset优化erase次数
   }
 }
 
