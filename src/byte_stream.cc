@@ -38,26 +38,30 @@ uint64_t Writer::bytes_pushed() const
 
 string_view Reader::peek() const
 {
-  return std::string_view( buffer_ );
+  return std::string_view( buffer_ ).substr( offset_ );
 }
 
 void Reader::pop( uint64_t len )
 {
-  len = min( len, buffer_.size() );
+  len = min( len, buffer_.size() - offset_ );
   if ( len == 0 )
     return;
-  buffer_.erase( 0, len );
+  offset_ += len;
   haveRead_ += len;
+  if ( offset_ > 65536 ) {
+    buffer_.erase( 0, offset_ );
+    offset_ = 0;
+  }
 }
 
 bool Reader::is_finished() const
 {
-  return writeClosed_ && buffer_.empty();
+  return writeClosed_ && buffer_.size() == offset_;
 }
 
 uint64_t Reader::bytes_buffered() const
 {
-  return buffer_.size();
+  return buffer_.size() - offset_;
 }
 
 uint64_t Reader::bytes_popped() const

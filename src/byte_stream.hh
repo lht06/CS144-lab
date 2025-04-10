@@ -27,7 +27,8 @@ protected:
   bool writeClosed_ {};
   uint64_t haveWritten_ {};
   uint64_t haveRead_ {};
-  uint64_t capacity_;
+  uint64_t capacity_{};
+  uint64_t offset_{};
   bool error_ {};
 };
 
