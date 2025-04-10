@@ -1,12 +1,16 @@
 #pragma once
 
 #include "byte_stream.hh"
+#include <cstdint>
+#include <vector>
 
 class Reassembler
 {
 public:
   // Construct Reassembler to write into given ByteStream.
   explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) ) {}
+  // 构造函数接受一个 右值引用的 ByteStream 对象（即一个临时的、可移动的流）。
+  // 使用 std::move(output) 表示你要把外部的流资源“夺过来”（而不是拷贝一份）。
 
   /*
    * Insert a new substring to be reassembled into a ByteStream.
@@ -42,5 +46,10 @@ public:
   const Writer& writer() const { return output_.writer(); }
 
 private:
-  ByteStream output_;
+  ByteStream output_; // 这是 Reassembler 最重要的内部成员：最终要把拼好的数据写到这个流里去。
+  uint64_t eof_len_ = -1;
+  uint64_t pending_bytes{};
+  std::vector<char> buffer_ {};
+  std::vector<bool> is_inserted_{};
+
 };

@@ -1,6 +1,6 @@
 #include "byte_stream.hh"
+#include <iostream>
 #include <string_view>
-
 using namespace std;
 
 ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
@@ -57,7 +57,7 @@ void Reader::pop( uint64_t len )
   haveRead_ += len;
   if ( offset_ > 8192 ) {
     buffer_.erase( 0, offset_ );
-    offset_ = 0;//offset优化erase次数
+    offset_ = 0; // offset优化erase次数
   }
 }
 
