@@ -4,6 +4,32 @@
 #include <cstdint>
 #include <vector>
 
+class DynamicBitset
+{
+public:
+  DynamicBitset( u_int64_t size ) : bitset( ( size + 63 ) / 64, 0 ) {}
+
+  // 调整大小
+  void resize( uint64_t n );
+
+  // 设置某个位为 1
+  void set( uint64_t index );
+
+  // 设置某个位为 0
+  void reset( uint64_t index );
+
+  // 查找下一个为 0 的位
+  uint64_t find_next( uint64_t start = 0 ) const;
+
+  uint64_t find_first_zero_from( uint64_t start ) const;
+
+  // 获取指定位置的位值
+  bool get( uint64_t index ) const;
+
+private:
+  std::vector<uint64_t> bitset;
+};
+
 class Reassembler
 {
 public:
@@ -48,8 +74,8 @@ public:
 private:
   ByteStream output_; // 这是 Reassembler 最重要的内部成员：最终要把拼好的数据写到这个流里去。
   uint64_t eof_len_ = -1;
-  uint64_t pending_bytes{};
+  uint64_t pending_bytes_ {};
   std::vector<char> buffer_ {};
-  std::vector<bool> is_inserted_{};
-
+  // std::vector<bool> is_inserted_ {};
+  DynamicBitset is_inserted_{0};
 };
