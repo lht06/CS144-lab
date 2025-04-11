@@ -21,6 +21,7 @@ public:
   // 查找下一个为 0 的位
   uint64_t find_next( uint64_t start = 0 ) const;
 
+  // 查找从这个位置开始第一个0
   uint64_t find_first_zero_from( uint64_t start ) const;
 
   // 获取指定位置的位值
@@ -77,5 +78,5 @@ private:
   uint64_t pending_bytes_ {};
   std::vector<char> buffer_ {};
   // std::vector<bool> is_inserted_ {};
-  DynamicBitset is_inserted_{0};
+  DynamicBitset is_inserted_ { 0 };
 };

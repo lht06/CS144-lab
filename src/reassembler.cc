@@ -72,28 +72,28 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   if ( is_last_substring ) {
     eof_len_ = first_index + data.size(); // 记录eoflen
   }
-  auto read_end = output_.writer().bytes_pushed();
-  auto write_end = read_end + output_.writer().available_capacity();
-  auto loop_end = min( first_index + data.size(), write_end );
+  auto read_end = output_.writer().bytes_pushed();//已经推了多少进去
+  auto write_end = read_end + output_.writer().available_capacity();//最多能读多少
+  auto loop_end = min( first_index + data.size(), write_end );//和字符串的最后位置取最小值
   if ( buffer_.size() < loop_end ) {
-    buffer_.resize( loop_end * 2, '\0' );
+    buffer_.resize( loop_end * 2, '\0' );//扩容 利用x2 导致最多扩容log次 
     is_inserted_.resize( loop_end * 2 );
   }
   for ( uint64_t i = is_inserted_.find_first_zero_from( max( first_index, read_end ) ); i < loop_end;
-        i = is_inserted_.find_next( i ) ) {
+        i = is_inserted_.find_next( i ) ) {//利用动态bitset快速找到第一个没填的位置
     buffer_[i] = data[i - first_index];
     is_inserted_.set( i );
     pending_bytes_++;
   }
   auto pre_read = read_end;
-  read_end=is_inserted_.find_first_zero_from(read_end);
+  read_end=is_inserted_.find_first_zero_from(read_end);//利用动态bitset找到连续的1
   string put( read_end - pre_read, '\0' );
   for ( uint64_t i = pre_read; i < read_end; i++ )
     put[i - pre_read] = buffer_[i];
   auto pre_bytes = output_.writer().bytes_pushed();
-  output_.writer().push( move( put ) );
+  output_.writer().push( move( put ) );//move加速
   auto suf_bytes = output_.writer().bytes_pushed();
-  pending_bytes_ -= suf_bytes - pre_bytes;
+  pending_bytes_ -= suf_bytes - pre_bytes;//读了多少进去
   if ( eof_len_ != static_cast<uint64_t>( -1 ) && read_end == eof_len_ ) {
     output_.writer().close();
   }
