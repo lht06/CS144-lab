@@ -24,13 +24,15 @@
 
 struct TCPSenderMessage
 {
-  Wrap32 seqno { 0 };
+  Wrap32 seqno { 0 }; // 表示该 TCP 段的初始序列号
 
-  bool SYN {};
-  std::string payload {};
-  bool FIN {};
+  bool SYN {}; // 代表 TCP 报文段中的 SYN 标志。SYN（synchronize）用于初始化一个连接（例如在三次握手的第一步中）。
+  std::string
+    payload {}; // 表示 TCP 段中实际传输的数据内容（负载）。在实际传输过程中，payload 可能包含用户数据或者应用数据。
+  bool FIN {}; // 表示 TCP 报文段中的 FIN 标志。FIN（finish）用于表明发送方已经没有数据要发送了，并且希望关闭连接。
 
-  bool RST {};
+  bool RST {}; // 表示 TCP 报文段中的 RST
+               // 标志。RST（reset）用于异常中断一个连接，比如在出现错误或非法请求时，可以立即中断连接。
 
   // How many sequence numbers does this segment use?
   size_t sequence_length() const { return SYN + payload.size() + FIN; }
