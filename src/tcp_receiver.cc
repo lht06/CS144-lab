@@ -72,8 +72,8 @@ TCPReceiverMessage TCPReceiver::send() const
   TCPReceiverMessage msg {};
 
   if ( isn_.has_value() ) {
-    // 连续组装好的数据数 = bytes_popped() + bytes_buffered()
-    uint64_t contiguous = reassembler_.reader().bytes_popped() + reassembler_.reader().bytes_buffered();
+    // 连续组装好的数据数
+    uint64_t contiguous = reassembler_.writer().bytes_pushed();
 
     // 加上 SYN 消耗的1个序号。
     uint64_t next_expected_byte = contiguous + 1;

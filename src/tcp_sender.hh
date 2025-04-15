@@ -1,10 +1,13 @@
 #pragma once
 
 #include "byte_stream.hh"
+#include "tcp_config.hh"
 #include "tcp_receiver_message.hh"
 #include "tcp_sender_message.hh"
 
+#include <cstdint>
 #include <functional>
+#include <queue>
 
 class TCPSender
 {
@@ -42,4 +45,15 @@ private:
   ByteStream input_;
   Wrap32 isn_;
   uint64_t initial_RTO_ms_;
+  uint64_t current_ROT_ms_{};
+  uint16_t current_window_size_ = 1;
+  uint64_t next_seq_{};
+  uint64_t last_ackno_{};
+  uint64_t current_time_{};
+  uint64_t consecutive_retransmissions_{};
+  uint64_t sequence_numbers_in_flight_{};
+  bool is_syn_ {};
+  bool is_fin_ {};
+  bool is_rst_ {};
+  std::queue<std::pair<TCPSenderMessage,int>> not_ackownledge_{};
 };
