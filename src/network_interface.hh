@@ -4,8 +4,12 @@
 #include "ethernet_frame.hh"
 #include "ipv4_datagram.hh"
 
+#include <array>
+#include <cstdint>
+#include <map>
 #include <memory>
 #include <queue>
+#include <set>
 
 // A "network interface" that connects IP (the internet layer, or network layer)
 // with Ethernet (the network access layer, or link layer).
@@ -82,4 +86,18 @@ private:
 
   // Datagrams that have been received
   std::queue<InternetDatagram> datagrams_received_ {};
+
+  std::map<uint32_t, EthernetAddress> ip_to_address_ {};
+
+  std::set<uint32_t> recently_query_ {};
+
+  uint64_t current_time_ {};
+
+  std::queue<std::array<uint64_t, 2>> ip_to_address_query_ {};
+
+  std::map<uint64_t, uint64_t> ip_to_address_cnt {};
+
+  std::map<uint32_t, std::vector<std::pair<uint64_t, InternetDatagram>>> waiting_datagrams_ {};
+
+  std::queue<std::array<uint64_t, 2>> recently_query_queue_ {};
 };
