@@ -32,8 +32,9 @@ uint64_t Wrap32::unwrap( Wrap32 zero_point, uint64_t checkpoint ) const
       return a - b;
     }
   };
-  vector<array<uint64_t,2>> candidate{{distance(ans1, checkpoint),ans1},{distance(ans2, checkpoint),ans2},
-  {distance(ans3, checkpoint),ans3}};
-  ranges::sort(candidate);
+  vector<array<uint64_t, 2>> candidate { { distance( ans1, checkpoint ), ans1 },
+                                         { distance( ans2, checkpoint ), ans2 },
+                                         { distance( ans3, checkpoint ), ans3 } };
+  ranges::sort( candidate );
   return candidate[0][1];
 }

@@ -91,7 +91,7 @@ void TCPSender::push( const TransmitFunction& transmit )
     }
     msg.seqno = msg.seqno.wrap( next_seq_, isn_ );
     next_seq_ += transmit_size;
-    if (  effictive_window_size - unacknowledged_message > transmit_size && input_.reader().is_finished() ) {
+    if ( effictive_window_size - unacknowledged_message > transmit_size && input_.reader().is_finished() ) {
       msg.FIN = true;
       is_fin_ = true;
       next_seq_++;
@@ -100,7 +100,7 @@ void TCPSender::push( const TransmitFunction& transmit )
 
     not_ackownledge_.push( { msg, current_time_ } );
     sequence_numbers_in_flight_ += msg.payload.size();
-    transmit( move(msg) );
+    transmit( move( msg ) );
     if ( is_break ) {
       break;
     }
@@ -166,7 +166,7 @@ void TCPSender::tick( uint64_t ms_since_last_tick, const TransmitFunction& trans
     auto& [data, transmit_time] = not_ackownledge_.front();
     if ( current_time_ - transmit_time >= current_ROT_ms_ ) {
       transmit_time = current_time_;
-      transmit( move(data) );
+      transmit( move( data ) );
       consecutive_retransmissions_++;
       if ( current_window_size_ > 0 ) {
         current_ROT_ms_ *= 2;

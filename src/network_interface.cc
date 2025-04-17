@@ -38,7 +38,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
 {
   const uint32_t ip = next_hop.ipv4_numeric();
   if ( auto iter = ip_to_address_.find( ip ); iter == ip_to_address_.end() ) {
-    waiting_datagrams_[ip].push_back( {current_time_,dgram} );
+    waiting_datagrams_[ip].push_back( { current_time_, dgram } );
     if ( recently_query_.contains( ip ) ) {
       return;
     }
@@ -98,8 +98,9 @@ void NetworkInterface::recv_frame( EthernetFrame frame )
 
     if ( arp.opcode == ARPMessage::OPCODE_REPLY ) {
       if ( waiting_datagrams_.count( arp.sender_ip_address ) ) {
-        for ( auto [add_time,dgram] : waiting_datagrams_[arp.sender_ip_address] ) {
-          if (current_time_-add_time>5000) continue;
+        for ( auto [add_time, dgram] : waiting_datagrams_[arp.sender_ip_address] ) {
+          if ( current_time_ - add_time > 5000 )
+            continue;
           Serializer S;
           dgram.serialize( S );
           EthernetHeader frame_header = {

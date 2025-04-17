@@ -1,16 +1,19 @@
 #pragma once
 
+#include "address.hh"
 #include "exception.hh"
 #include "network_interface.hh"
 
+#include <cstdint>
 #include <optional>
+#include <vector>
 
 // \brief A router that has multiple network interfaces and
 // performs longest-prefix-match routing between them.
 class Router
 {
 public:
-  // Add an interface to the router
+  // Add an interface to the router 
   // \param[in] interface an already-constructed network interface
   // \returns The index of the interface after it has been added to the router
   size_t add_interface( std::shared_ptr<NetworkInterface> interface )
@@ -31,7 +34,16 @@ public:
   // Route packets between the interfaces
   void route();
 
+  struct Router_Table
+  {
+    uint32_t route_prefix;
+    uint8_t prefix_length;
+    std::optional<Address> next_hop;
+    size_t interface_num;
+  };
+
 private:
   // The router's collection of network interfaces
   std::vector<std::shared_ptr<NetworkInterface>> interfaces_ {};
+  std::vector<Router_Table> router_table_ {};
 };
